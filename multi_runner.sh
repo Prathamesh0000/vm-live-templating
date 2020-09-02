@@ -24,10 +24,10 @@ create_cow_from_base()
 
 
     # Check if folder exists
-    if [ ! -d $dir"/vm-mem-template/" ];
+    if [ ! -d $dir"/vm-template/" ];
         then
-            echo "creating path :"$dir"/vm-mem-template/"
-            mkdir "$dir"/vm-mem-template/""
+            echo "creating path :"$dir"/vm-template/"
+            mkdir "$dir"/vm-template/""
     fi
 
     # check if template exists
@@ -35,7 +35,7 @@ create_cow_from_base()
         echo "$storageImg does not exist. Creating image from "${base}
         echo "qemu-img create -f qcow2 -b ${base}  ${storageImg}"
         qemu-img create -f qcow2 -b $base $storageImg
-        sudo chown ppatil ${storageImg}
+        sudo chown $USER ${storageImg}
     fi
 
 }
@@ -57,7 +57,7 @@ backingStore="/run/vm"
 
 for ((i = 1; i <= $noOfVm; i++)) 
 do 
-    storageImg=$dir"/vm-mem-template/ubuntu-image-"${i}".img"
+    storageImg=$dir"/vm-template/ubuntu-image-"${i}".img"
 
     echo "Running ${i}th vm with $2 cores "
     create_cow_from_base $i $storageImg
