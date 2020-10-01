@@ -11,10 +11,11 @@ create_cow_from_base()
 
     id=$1
     storageImg=$2
+    base=$3
     dir=$(pwd) 
 
     #storageImg=$dir"/vm-mem-template/ubuntu-image-"${id}".img"
-    base=$dir"/ubuntu-ssh.img"
+    #base=$dir"/ubuntu-ssh.img"
 
     # Check for root
     if [ "$EUID" -ne 0 ]
@@ -51,20 +52,34 @@ sshport="10000"
 
 dir=$(pwd) 
 
-base=$dir"ubuntu-ssh.img"
 backingStore="/run/vm"
+fromTemplate=1
 
+if [ $fromTemplate -eq 1 ];
+then
+	base=$dir"/ubuntu-ssh.img"
+	storageImg=$dir"/vm-template/ubuntu-image-0.img"
+	
+    echo "Running ${i}th vm with $2 cores memory_backed"
+    create_cow_from_base 0 $storageImg $base
+    sudo bash run_vm_template.sh -o memory_backend -v $noOfCore -r $memSize -m ${storageImg} -t $backingStore -i 0 &	
+else
+	base=$dir"/vm-template/ubuntu-image-0.img"
+	#base=$dir"/ubuntu-ssh.img"
+	for ((i = 1; i <= $noOfVm; i++)) 
+	do 
+	    storageImg=$dir"/vm-template/ubuntu-image-"${i}".img"
+   	    create_cow_from_base $i $storageImg $base
+	done
+	for ((i = 1; i <= $noOfVm; i++)) 
+	do 	
+	    echo "Running ${i}th vm with $2 cores "
+       	storageImg=$dir"/vm-template/ubuntu-image-"${i}".img"
+	    #sudo bash run_vm_template.sh -o base -v $noOfCore -r $memSize -m ${storageImg} -t $backingStore -i ${i} &
+	    sudo bash run_vm_template.sh -o template -v $noOfCore -r $memSize -m ${storageImg} -t $backingStore -i ${i} &
 
-for ((i = 1; i <= $noOfVm; i++)) 
-do 
-    storageImg=$dir"/vm-template/ubuntu-image-"${i}".img"
-
-    echo "Running ${i}th vm with $2 cores "
-    create_cow_from_base $i $storageImg
-#    sudo bash run_vm_template.sh -o memory_backend -v $noOfCore -r $memSize -m ${storageImg} -t $backingStore -i ${i} &
-    sudo bash run_vm_template.sh -o template -v $noOfCore -r $memSize -m ${storageImg} -t $backingStore -i ${i} &
-    sleep 0.2m
-    free >> freelogs.txt
-#    sudo bash ps-mem.sh
-done
-
+	 #   sleep 0.2m
+	 #   free >> freelogs.txt
+	#    sudo bash ps-mem.sh
+	done
+fi

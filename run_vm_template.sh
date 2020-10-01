@@ -24,15 +24,18 @@ run_base()
         local port=$(( i + 8800 ))
         local sdir="/tmp"
 
-        $qemu -machine ${machine},accel=kvm \
-         -cpu host\
-         -smp ${vcpu},cores=${vcpu},threads=1,sockets=1 \
-         -m   ${ram},slots=4,maxmem=10240M\
-         -drive file=${img},if=virtio \
-         -net user,hostfwd=tcp::$((10000+${i}))-:22 \
-         -monitor telnet:127.0.0.1:$((1000+${i})),server,nowait \
-         -serial telnet:127.0.0.1:$((2000+${i})),server,nowait \
-         -net nic 
+ 
+        $qemu -machine ${machine},accel=kvm,kernel_irqchip=on \
+            -cpu host,host-cache-info=on \
+            -smp ${vcpu},cores=${vcpu},threads=1,sockets=1 \
+            -m   ${ram},slots=4,maxmem=10240M\
+            -drive file=${img},if=virtio \
+            -net user,hostfwd=tcp::$((10000+${i}))-:22 \
+            -net nic \
+            -qmp unix:${sdir}/qmp-${i}.sock,server,nowait \
+            -monitor telnet:127.0.0.1:$((1000+${i})),server,nowait \
+            -serial telnet:127.0.0.1:$((2000+${i})),server,nowait \
+            -nographic
      
 }
 
@@ -47,13 +50,27 @@ run_by_memory_backend()
         local max_vcpu=$(( vcpu - 1 ))
         local port=$(( i + 8800 ))
         local sdir="/tmp"
+echo $img
+        # $qemu -machine ${machine},accel=kvm,kernel_irqchip=on \
+            # -cpu host,host-cache-info=on \
+            # -smp ${vcpu},cores=${vcpu},threads=1,sockets=1 \
+            # -m  ${ram},slots=4,maxmem=10240M \
+            # -object memory-backend-file,id=mem0,size=${ram},mem-path="${tdir}/memory",share=on \
+            # -numa node,nodeid=0,cpus=0-${max_vcpu},memdev=mem0 \
+            # -device virtio-balloon \
+            # -drive file=${img},if=virtio \
+            # -net user,hostfwd=tcp::$((10000+${i}))-:22 \
+            # -net nic \
+            # -qmp unix:${sdir}/qmp-${i}.sock,server,nowait \
+            # -monitor telnet:127.0.0.1:$((1000+${i})),server,nowait \
+            # -serial telnet:127.0.0.1:$((2000+${i})),server,nowait \
+            # -nographic
 
+            
         $qemu -machine ${machine},accel=kvm,kernel_irqchip=on \
             -cpu host,host-cache-info=on \
             -smp ${vcpu},cores=${vcpu},threads=1,sockets=1 \
             -m   ${ram},slots=4,maxmem=10240M\
-            -object memory-backend-file,id=mem0,size=${ram},mem-path=${tdir}/memory,share=on \
-            -numa node,nodeid=0,cpus=0-${max_vcpu},memdev=mem0 \
             -drive file=${img},if=virtio \
             -net user,hostfwd=tcp::$((10000+${i}))-:22 \
             -net nic \
@@ -78,6 +95,7 @@ run_by_template()
             -cpu host,host-cache-info=on \
             -smp ${vcpu},cores=${vcpu},threads=1,sockets=1 \
             -m   ${ram},slots=4,maxmem=10240M\
+ 			-device virtio-balloon \ 
             -object memory-backend-file,id=mem0,size=${ram},mem-path="${tdir}/memory",share=off \
             -numa node,nodeid=0,cpus=0-${max_vcpu},memdev=mem0 \
             -drive file=${img},if=virtio \
