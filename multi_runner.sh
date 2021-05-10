@@ -53,7 +53,7 @@ sshport="10000"
 dir=$(pwd) 
 
 backingStore="/run/vm"
-fromTemplate=1
+fromTemplate=0
 
 if [ $fromTemplate -eq 1 ];
 then
@@ -74,9 +74,9 @@ else
 	for ((i = 1; i <= $noOfVm; i++)) 
 	do 	
 	    echo "Running ${i}th vm with $2 cores "
-       	storageImg=$dir"/vm-template/ubuntu-image-"${i}".img"
-	    #sudo bash run_vm_template.sh -o base -v $noOfCore -r $memSize -m ${storageImg} -t $backingStore -i ${i} &
-	    sudo bash run_vm_template.sh -o template -v $noOfCore -r $memSize -m ${storageImg} -t $backingStore -i ${i} &
+       	    storageImg=$dir"/vm-template/ubuntu-image-"${i}".img"
+	    sudo bash run_vm_template.sh -o base -v $noOfCore -r $memSize -m ${storageImg} -t $backingStore -i ${i} &
+	    #sudo bash run_vm_template.sh -o template -v $noOfCore -r $memSize -m ${storageImg} -t $backingStore -i ${i} &
 
 	 #   sleep 0.2m
 	 #   free >> freelogs.txt

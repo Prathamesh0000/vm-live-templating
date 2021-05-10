@@ -1,0 +1,1 @@
+cmd_/home/prathamesh/Documents/vm-live-templating/vfn-pfn-converter/Module.symvers := sed 's/ko$$/o/' /home/prathamesh/Documents/vm-live-templating/vfn-pfn-converter/modules.order | scripts/mod/modpost -m -a   -o /home/prathamesh/Documents/vm-live-templating/vfn-pfn-converter/Module.symvers -e -i Module.symvers   -T -

@@ -1,0 +1,1 @@
+cmd_/home/prathamesh/Documents/vm-live-templating/vfn-pfn-converter/query_ioctl.mod := { echo  /home/prathamesh/Documents/vm-live-templating/vfn-pfn-converter/query_ioctl.o; echo; } > /home/prathamesh/Documents/vm-live-templating/vfn-pfn-converter/query_ioctl.mod
